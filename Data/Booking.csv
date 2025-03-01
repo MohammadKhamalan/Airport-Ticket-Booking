@@ -1,0 +1,10 @@
+BookingId,FlightId,PassengerId,ClassType
+2,22,55,Busnisses
+4,104,4,Economy
+5,106,5,Business
+6,108,6,First Class
+7,107,7,Economy
+8,105,8,Business
+9,33,44,Economic
+10,110,10,Economy
+11,56,77,Economic

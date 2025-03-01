@@ -1,0 +1,13 @@
+C:\Users\ASUS\Desktop\Airport Ticket Booking\bin\Debug\netcoreapp3.1\Airport Ticket Booking.exe
+C:\Users\ASUS\Desktop\Airport Ticket Booking\bin\Debug\netcoreapp3.1\Airport Ticket Booking.deps.json
+C:\Users\ASUS\Desktop\Airport Ticket Booking\bin\Debug\netcoreapp3.1\Airport Ticket Booking.runtimeconfig.json
+C:\Users\ASUS\Desktop\Airport Ticket Booking\bin\Debug\netcoreapp3.1\Airport Ticket Booking.runtimeconfig.dev.json
+C:\Users\ASUS\Desktop\Airport Ticket Booking\bin\Debug\netcoreapp3.1\Airport Ticket Booking.dll
+C:\Users\ASUS\Desktop\Airport Ticket Booking\bin\Debug\netcoreapp3.1\Airport Ticket Booking.pdb
+C:\Users\ASUS\Desktop\Airport Ticket Booking\obj\Debug\netcoreapp3.1\Airport Ticket Booking.csprojAssemblyReference.cache
+C:\Users\ASUS\Desktop\Airport Ticket Booking\obj\Debug\netcoreapp3.1\Airport Ticket Booking.AssemblyInfoInputs.cache
+C:\Users\ASUS\Desktop\Airport Ticket Booking\obj\Debug\netcoreapp3.1\Airport Ticket Booking.AssemblyInfo.cs
+C:\Users\ASUS\Desktop\Airport Ticket Booking\obj\Debug\netcoreapp3.1\Airport Ticket Booking.csproj.CoreCompileInputs.cache
+C:\Users\ASUS\Desktop\Airport Ticket Booking\obj\Debug\netcoreapp3.1\Airport Ticket Booking.dll
+C:\Users\ASUS\Desktop\Airport Ticket Booking\obj\Debug\netcoreapp3.1\Airport Ticket Booking.pdb
+C:\Users\ASUS\Desktop\Airport Ticket Booking\obj\Debug\netcoreapp3.1\Airport Ticket Booking.genruntimeconfig.cache
