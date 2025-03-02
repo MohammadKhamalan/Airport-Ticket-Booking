@@ -15,8 +15,10 @@ namespace Airport_Ticket_Booking.Services
             ImportFlightsFromCSV();
         }
 
+
         public void ImportFlightsFromCSV()
         {
+            flights.Clear();
             if (File.Exists(flight_path))
             {
                 var lines = File.ReadAllLines(flight_path).Skip(1);
@@ -25,52 +27,61 @@ namespace Airport_Ticket_Booking.Services
                 foreach (var line in lines)
                 {
                     var data = line.Split(',');
+                    List<string> lineErrors = new List<string>();
+
                     try
                     {
-                        if (data.Length < 9)
+                        if (data.Length != 9)
                         {
-                            errors.Add($"Invalid data format in line: {line}");
-                            continue;
+                            lineErrors.Add($"Invalid data format: Expected 9 fields but found {data.Length} -> {line}");
                         }
 
-                        if (!int.TryParse(data[0], out int flightId))
+                        if (!int.TryParse(data[0].Trim(), out int flightId))
                         {
-                            errors.Add($"Invalid Flight ID in line: {line}");
-                            continue;
+                            lineErrors.Add("Invalid Flight ID (Must be an integer).");
                         }
 
                         if (string.IsNullOrWhiteSpace(data[1]) || string.IsNullOrWhiteSpace(data[2]))
                         {
-                            errors.Add($"Missing departure or destination country in line: {line}");
-                            continue;
+                            lineErrors.Add("Missing departure or destination country.");
                         }
 
-                        if (!DateTime.TryParse(data[5], out DateTime departureDate))
+                        if (!DateTime.TryParse(data[5].Trim(), out DateTime departureDate))
                         {
-                            errors.Add($"Invalid departure date format in line: {line}");
-                            continue;
+                            lineErrors.Add($"Invalid departure date: {data[5]} (Expected format: YYYY-MM-DD)");
+                        }
+                        else if (departureDate < DateTime.Today)
+                        {
+                            lineErrors.Add("Departure date cannot be in the past.");
                         }
 
-                        if (!double.TryParse(data[6], out double economyPrice) ||
-                            !double.TryParse(data[7], out double businessPrice) ||
-                            !double.TryParse(data[8], out double firstClassPrice))
+                        bool validEconomy = double.TryParse(data[6].Trim(), out double economyPrice);
+                        bool validBusiness = double.TryParse(data[7].Trim(), out double businessPrice);
+                        bool validFirstClass = double.TryParse(data[8].Trim(), out double firstClassPrice);
+
+                        if (!validEconomy || !validBusiness || !validFirstClass)
                         {
-                            errors.Add($"Invalid price format in line: {line}");
-                            continue;
+                            lineErrors.Add($"Invalid price format: {data[6]}, {data[7]}, {data[8]} (Must be numeric)");
                         }
 
                         if (flights.Any(f => f.FlightId == flightId))
                         {
-                            errors.Add($"Duplicate Flight ID {flightId} in line: {line}");
-                            continue;
+                            lineErrors.Add($"Duplicate Flight ID: {flightId}.");
                         }
 
-                        var flight = new Flight(flightId, data[1], data[2], data[3], data[4], departureDate, economyPrice, businessPrice, firstClassPrice);
-                        flights.Add(flight);
+                        if (lineErrors.Count > 0)
+                        {
+                            errors.Add($"Line: {line} -> Errors: {string.Join(", ", lineErrors)}");
+                        }
+                        else
+                        {
+                            var flight = new Flight(flightId, data[1].Trim(), data[2].Trim(), data[3].Trim(), data[4].Trim(), departureDate, economyPrice, businessPrice, firstClassPrice);
+                            flights.Add(flight);
+                        }
                     }
                     catch (Exception ex)
                     {
-                        errors.Add($"Error processing line: {line}. Error: {ex.Message}");
+                        errors.Add($"Unexpected error in line: {line}. Error: {ex.Message}");
                     }
                 }
 
@@ -85,6 +96,7 @@ namespace Airport_Ticket_Booking.Services
                 }
             }
         }
+
 
         public void SaveFlights()
         {
@@ -112,3 +124,10 @@ namespace Airport_Ticket_Booking.Services
         }
     }
 }
+
+
+
+
+
+
+

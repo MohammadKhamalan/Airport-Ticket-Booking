@@ -32,9 +32,9 @@ namespace Airport_Ticket_Booking.Services
         }
         public void Book(int flight_id, int passenger_id, string classType)
         {
-            int NewBookingId = (Bookings.Count > 0) ? Bookings.Max(b=>b.Id + 1) : 1;
+            int NewBookingId = (Bookings.Count > 0) ? Bookings.Max(b => b.Id + 1) : 1;
             Bookings.Add(new Booking(NewBookingId, flight_id, passenger_id, classType));
-            using (StreamWriter sw = new StreamWriter(Booking_path, true)) 
+            using (StreamWriter sw = new StreamWriter(Booking_path, true))
             {
                 sw.WriteLine($"{NewBookingId},{flight_id},{passenger_id},{classType}");
             }
@@ -58,7 +58,7 @@ namespace Airport_Ticket_Booking.Services
 
                 Console.WriteLine($"Booking {bookingId} modified successfully!");
 
-                Save_Bookings(); 
+                Save_Bookings();
             }
             else
             {
@@ -68,7 +68,7 @@ namespace Airport_Ticket_Booking.Services
 
         public void Cancel_Book(int bookingId)
         {
-            var booking = Bookings.Find(booking=>booking.Id == bookingId);
+            var booking = Bookings.Find(booking => booking.Id == bookingId);
             if (booking != null)
             {
                 Bookings.Remove(booking);
@@ -85,7 +85,7 @@ namespace Airport_Ticket_Booking.Services
         {
             using (StreamWriter sw = new StreamWriter(Booking_path, false))
             {
-                sw.WriteLine("BookingId,FlightId,PassengerId,ClassType"); 
+                sw.WriteLine("BookingId,FlightId,PassengerId,ClassType");
                 foreach (var booking in Bookings)
                 {
                     sw.WriteLine($"{booking.Id},{booking.FlightId},{booking.PassengerId},{booking.ClassType}");
@@ -95,13 +95,13 @@ namespace Airport_Ticket_Booking.Services
 
 
         public void Display_Bookings()
+        {
+            foreach (var booking in Bookings)
             {
-                foreach (var booking in Bookings)
-                {
-                    Console.WriteLine($"Booking {booking.Id}: Flight {booking.FlightId}, Class: {booking.ClassType}");
+                Console.WriteLine($"Booking {booking.Id}: Flight {booking.FlightId}, Class: {booking.ClassType}");
 
-                }
             }
-        
+        }
+
     }
 }
