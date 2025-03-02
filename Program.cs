@@ -7,7 +7,7 @@ namespace Airport_Ticket_Booking.Services
     {
         static void Main(string[] args)
         {
-           Console.WriteLine("Welcome to Airport Ticket Booking")
+           Console.WriteLine("Welcome to Airport Ticket Booking");
         }
 
         
