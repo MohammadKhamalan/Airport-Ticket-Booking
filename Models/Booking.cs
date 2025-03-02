@@ -10,7 +10,7 @@ namespace Airport_Ticket_Booking
             public int Id { get; set; }
             public int FlightId { get; set; }
             public int PassengerId { get; set; }
-            public string ClassType { get; set; } // Economy, Business, First
+            public string ClassType { get; set; } 
 
             public Booking(int id, int flightId, int passengerId, string classType)
             {
