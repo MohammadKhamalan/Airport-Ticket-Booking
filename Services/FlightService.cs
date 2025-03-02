@@ -109,12 +109,47 @@ namespace Airport_Ticket_Booking.Services
                 }
             }
         }
-
-        public List<Flight> SearchFlight(string departureCountry, string destinationCountry)
+        public List<Flight> Search_Available_Flights(double? maxprice, string departure_country, string destination_country, DateTime? deprature_date, string departure_airport, 
+            string arrival_airport, string class_type)
         {
-            return flights.Where(flight => flight.DepartureCountry == departureCountry && flight.DestinationCountry == destinationCountry).ToList();
-        }
+            var result= flights.Where(flight => (string.IsNullOrEmpty(departure_country) || flight.DepartureCountry.Equals(departure_country, StringComparison.OrdinalIgnoreCase)) &&
+               (string.IsNullOrEmpty(destination_country) || flight.DestinationCountry.Equals(destination_country, StringComparison.OrdinalIgnoreCase)) && (!deprature_date.HasValue || flight.DepartureDate.Date == deprature_date.Value.Date)
+               && (string.IsNullOrEmpty(departure_airport) || flight.DepartureAirport.Equals(departure_airport, StringComparison.OrdinalIgnoreCase)) &&
+                       (string.IsNullOrEmpty(arrival_airport) || flight.ArrivalAirport.Equals(arrival_airport, StringComparison.OrdinalIgnoreCase)) &&
+                       (!maxprice.HasValue ||
+    (class_type.Equals("Economy", StringComparison.OrdinalIgnoreCase) && flight.EconomyPrice <= maxprice) ||
+    (class_type.Equals("Business", StringComparison.OrdinalIgnoreCase) && flight.BusinessPrice <= maxprice) ||
+    (class_type.Equals("FirstClass", StringComparison.OrdinalIgnoreCase) && flight.FirstClassPrice <= maxprice))
 
+ ).ToList();
+            DisplaySearchResults(result);
+            return result;
+        }
+       
+        public void DisplaySearchResults(List<Flight> result)
+        {
+            if (result.Count == 0)
+            {
+                Console.WriteLine("No flights match your search criteria.");
+                return;
+
+            }
+            Console.WriteLine("Available Flights:");
+            Console.WriteLine("-------------------------------------------------------------");
+            foreach (var flight in result)
+            {
+                Console.WriteLine($"Flight ID: {flight.FlightId}");
+                Console.WriteLine($"From: {flight.DepartureCountry} ({flight.DepartureAirport})");
+                Console.WriteLine($"To: {flight.DestinationCountry} ({flight.ArrivalAirport})");
+                Console.WriteLine($"Departure Date: {flight.DepartureDate:yyyy-MM-dd}");
+                Console.WriteLine($"Economy Price: ${flight.EconomyPrice}");
+                Console.WriteLine($"Business Price: ${flight.BusinessPrice}");
+                Console.WriteLine($"First Class Price: ${flight.FirstClassPrice}");
+                Console.WriteLine("-------------------------------------------------------------");
+            }
+        
+
+    }
         public void DisplayFlights()
         {
             foreach (var flight in flights)

@@ -1,15 +1,15 @@
 ﻿using System;
-using Airport_Ticket_Booking.Services;
+using System.Collections.Generic;
 
-class Program
+namespace Airport_Ticket_Booking.Services
 {
-    static void Main()
+    class Program
     {
-        Console.WriteLine("Welcome to Airport Ticket Booking System");
-        FlightService f = new FlightService();
-        BookingService b = new BookingService();
-        f.DisplayFlights();
-        b.Book(101,3, "Economy");
+        static void Main(string[] args)
+        {
+           Console.WriteLine("Welcome to Airport Ticket Booking")
+        }
+
         
     }
 }
