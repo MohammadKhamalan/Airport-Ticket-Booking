@@ -27,7 +27,7 @@ namespace Airport_Ticket_Booking.Services
                 return;
             }
 
-            var lines = File.ReadAllLines(flight_path).Skip(1); // Skip header
+            var lines = File.ReadAllLines(flight_path).Skip(1);
             List<string> errors = new List<string>();
 
             foreach (var line in lines)
@@ -77,7 +77,7 @@ namespace Airport_Ticket_Booking.Services
 
                     if (lineErrors.Count > 0)
                     {
-                        if (user) // Only store errors if flag is true
+                        if (user) 
                         {
                             errors.Add($"Line: {line} -> Errors: {string.Join(", ", lineErrors)}");
                         }
