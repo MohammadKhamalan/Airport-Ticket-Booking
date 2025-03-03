@@ -59,7 +59,7 @@ namespace Airport_Ticket_Booking.Services
                 }
             }
 
-            return personal_bookings; // Now the method returns a List<Booking>
+            return personal_bookings; 
         }
 
         public void Modify_Book(int bookingId)
@@ -143,7 +143,7 @@ namespace Airport_Ticket_Booking.Services
                 return new List<Booking>();
             }
 
-            // Get available flights that match criteria and class type
+           
             var filteredFlights = flights.Search_Available_Flights(max_price, departure_country, destination_country, departure_date, departure_airport, arrival_airport, class_type);
 
             if (filteredFlights.Count == 0)
@@ -152,7 +152,7 @@ namespace Airport_Ticket_Booking.Services
                 return new List<Booking>();
             }
 
-            // Keep only bookings that have matching flights
+            
             result_booking = result_booking
                 .Where(booking => filteredFlights.Any(flight => flight.FlightId == booking.FlightId))
                 .ToList();
@@ -172,7 +172,7 @@ namespace Airport_Ticket_Booking.Services
             }
             else
             {
-                DisplayFilteredBookings(result_booking, double.MaxValue); // No max price filter
+                DisplayFilteredBookings(result_booking, double.MaxValue); 
             }
 
             return result_booking;
