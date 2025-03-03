@@ -1,13 +1,13 @@
 BookingId,FlightId,PassengerId,ClassType
 4,104,4,Economy
 5,106,5,Business
-6,108,6,First Class
+6,108,6,FirstClass
 7,107,7,Economy
 8,105,8,Business
-9,33,44,Economic
-10,110,10,Economy
-11,56,77,Economic
-12,1,101,Economy
-13,2,102,Business
-14,3,103,FirstClass
-15,101,3,Economy
+10,111,101,Business
+12,101,101,Business
+15,104,3,Business
+16,106,4,Economy
+17,101,56,Business
+18,101,56,Economy
+19,101,55,Economy

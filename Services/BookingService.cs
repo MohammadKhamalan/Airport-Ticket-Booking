@@ -9,10 +9,12 @@ namespace Airport_Ticket_Booking.Services
     class BookingService
     {
         private List<Booking> Bookings = new List<Booking>();
+        FlightService flights = new FlightService();
         string Booking_path = @"C:\Users\ASUS\Desktop\Airport Ticket Booking\Data\Booking.csv";
         public BookingService()
         {
             Load_Bookings();
+           
         }
         public void Load_Bookings()
         {
@@ -41,22 +43,53 @@ namespace Airport_Ticket_Booking.Services
             Console.WriteLine($"Booking {NewBookingId} added successfully!");
 
         }
+        public List<Booking> View_Personal_Bookings(int passenger_id)
+        {
+            var personal_bookings = Bookings.Where(booking => booking.PassengerId == passenger_id).ToList(); // Convert to List
+
+            if (personal_bookings.Count == 0)
+            {
+                Console.WriteLine("No bookings found for this passenger.");
+            }
+            else
+            {
+                foreach (var booking in personal_bookings)
+                {
+                    Console.WriteLine($"Booking {booking.Id}: Flight {booking.FlightId}, Class: {booking.ClassType}");
+                }
+            }
+
+            return personal_bookings; // Now the method returns a List<Booking>
+        }
+
         public void Modify_Book(int bookingId)
         {
             var booking = Bookings.Find(booking => booking.Id == bookingId);
 
             if (booking != null)
             {
-                Console.WriteLine("Enter New Flight ID:");
-                booking.FlightId = Convert.ToInt32(Console.ReadLine());
+                Console.WriteLine("Enter New Flight ID (Press Enter to keep current):");
+                string flightInput = Console.ReadLine();
+                if (int.TryParse(flightInput, out int newFlightId))
+                {
+                    booking.FlightId = newFlightId;
+                }
 
-                Console.WriteLine("Enter New Passenger ID:");
-                booking.PassengerId = Convert.ToInt32(Console.ReadLine());
+                Console.WriteLine("Enter New Passenger ID (Press Enter to keep current):");
+                string passengerInput = Console.ReadLine();
+                if (int.TryParse(passengerInput, out int newPassengerId))
+                {
+                    booking.PassengerId = newPassengerId;
+                }
 
-                Console.WriteLine("Enter New Class type:");
-                booking.ClassType = Console.ReadLine();
+                Console.WriteLine("Enter New Class Type (Press Enter to keep current):");
+                string newClassType = Console.ReadLine();
+                if (!string.IsNullOrWhiteSpace(newClassType))
+                {
+                    booking.ClassType = newClassType;
+                }
 
-                Console.WriteLine($"Booking {bookingId} modified successfully!");
+                Console.WriteLine($"Booking {booking.Id} modified successfully!");
 
                 Save_Bookings();
             }
@@ -65,6 +98,7 @@ namespace Airport_Ticket_Booking.Services
                 Console.WriteLine($"Booking with ID {bookingId} not found.");
             }
         }
+
 
         public void Cancel_Book(int bookingId)
         {
@@ -92,6 +126,101 @@ namespace Airport_Ticket_Booking.Services
                 }
             }
         }
+        public List<Booking> filtered_Bookings(int? id, double? max_price, string departure_country, string destination_country, DateTime? departure_date,
+     string departure_airport, string arrival_airport, int? passenger_id, string class_type)
+        {
+            flights.ImportFlightsFromCSV(true);
+            var result_booking = Bookings
+                .Where(booking =>
+                    (!id.HasValue || booking.FlightId == id.Value) &&
+                    (!passenger_id.HasValue || booking.PassengerId == passenger_id.Value) &&
+                    (string.IsNullOrEmpty(class_type) || booking.ClassType.Equals(class_type, StringComparison.OrdinalIgnoreCase))
+                ).ToList();
+
+            if (result_booking.Count == 0)
+            {
+                Console.WriteLine("No bookings match your search criteria.");
+                return new List<Booking>();
+            }
+
+            // Get available flights that match criteria and class type
+            var filteredFlights = flights.Search_Available_Flights(max_price, departure_country, destination_country, departure_date, departure_airport, arrival_airport, class_type);
+
+            if (filteredFlights.Count == 0)
+            {
+                Console.WriteLine("No flights match your search criteria.");
+                return new List<Booking>();
+            }
+
+            // Keep only bookings that have matching flights
+            result_booking = result_booking
+                .Where(booking => filteredFlights.Any(flight => flight.FlightId == booking.FlightId))
+                .ToList();
+
+            if (result_booking.Count == 0)
+            {
+                Console.WriteLine("No bookings match the available flights.");
+                return new List<Booking>();
+            }
+
+
+
+
+            if (max_price.HasValue)
+            {
+                DisplayFilteredBookings(result_booking, max_price.Value);
+            }
+            else
+            {
+                DisplayFilteredBookings(result_booking, double.MaxValue); // No max price filter
+            }
+
+            return result_booking;
+        }
+
+        public void DisplayFilteredBookings(List<Booking> bookings, double maxPrice)
+        {
+            if (bookings.Count == 0)
+            {
+                Console.WriteLine("No matching bookings found.");
+                return;
+            }
+
+            var bookingWithPrices = from booking in bookings
+                                    join flight in flights.GetFlights() on booking.FlightId equals flight.FlightId
+                                    let price = booking.ClassType.Equals("Economy", StringComparison.OrdinalIgnoreCase) ? flight.EconomyPrice :
+                                                booking.ClassType.Equals("Business", StringComparison.OrdinalIgnoreCase) ? flight.BusinessPrice :
+                                                flight.FirstClassPrice 
+                                    where price <= maxPrice
+
+                                    select new
+                                    {
+                                        booking.Id,
+                                        booking.FlightId,
+                                        booking.PassengerId,
+                                        booking.ClassType,
+                                        Price = price
+                                    };
+
+            if (!bookingWithPrices.Any()) 
+            {
+                Console.WriteLine("No matching bookings found within the price limit.");
+                return;
+            }
+
+            Console.WriteLine("Filtered Bookings with Prices:");
+            Console.WriteLine("-------------------------------------------------------------");
+            foreach (var booking in bookingWithPrices)
+            {
+                Console.WriteLine($"Booking ID: {booking.Id}");
+                Console.WriteLine($"Flight ID: {booking.FlightId}");
+                Console.WriteLine($"Passenger ID: {booking.PassengerId}");
+                Console.WriteLine($"Class: {booking.ClassType}");
+                Console.WriteLine($"Price: {booking.Price} USD");
+                Console.WriteLine("-------------------------------------------------------------");
+            }
+        }
+
 
 
         public void Display_Bookings()
