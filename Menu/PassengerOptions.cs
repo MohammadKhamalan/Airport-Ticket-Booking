@@ -54,7 +54,6 @@ namespace Airport_Ticket_Booking.Menu
                 }
             }
         }
-
         public static void ManageBookings()
         {
             bool backToPassengerMenu = false;
@@ -131,16 +130,12 @@ namespace Airport_Ticket_Booking.Menu
 
             Console.WriteLine("Enter arrival airport (or press Enter to skip):");
             string arrivalAirport = Console.ReadLine();
-
             Console.WriteLine("Enter maximum price (or press Enter to skip):");
             string priceInput = Console.ReadLine();
             double? maxPrice = string.IsNullOrWhiteSpace(priceInput) ? (double?)null : double.Parse(priceInput);
-
             Console.WriteLine("Enter class type (economy, business, firstclass) (or press Enter to skip):");
             string classTypeInput = Console.ReadLine();
             ClassType? classType = null;
-
-
             if (!string.IsNullOrEmpty(classTypeInput))
             {
                 if (Enum.TryParse<ClassType>(classTypeInput, true, out var parsedClassType))
@@ -153,11 +148,9 @@ namespace Airport_Ticket_Booking.Menu
                     classType = ClassType.Economy;
                 }
             }
-
             List<Flight> results = flightService.Search_Available_Flights(maxPrice, departureCountry, destinationCountry, departureDate, departureAirport, arrivalAirport, classType?.ToString());
             flightService.DisplaySearchResults(results);
         }
-
         static void GetBookingDetails()
         {
             bookingservice.Load_Bookings();
@@ -173,25 +166,33 @@ namespace Airport_Ticket_Booking.Menu
             {
                 Console.WriteLine("Invalid input. Please enter a valid ID:");
             }
-
             Console.WriteLine("Enter Class Type (Economy/Business/FirstClass):");
             string class_type_input;
             ClassType class_type_enum;
-
             while (true)
             {
-                class_type_input = Console.ReadLine()?.Trim().ToLower();
-                if (Enum.TryParse(class_type_input, true, out class_type_enum))
+                class_type_input = Console.ReadLine()?.Trim();
+                if (string.IsNullOrEmpty(class_type_input))
+                {
+                    Console.WriteLine("Invalid input. Class type cannot be empty. Please enter 'Economy', 'Business', or 'FirstClass':");
+                    continue;
+                }
+                class_type_input = class_type_input.ToLower();
+                if (class_type_input == "economy")
+                    class_type_input = "Economy";
+                else if (class_type_input == "business")
+                    class_type_input = "Business";
+                else if (class_type_input == "firstclass")
+                    class_type_input = "FirstClass";
+                if (Enum.TryParse(class_type_input, out class_type_enum) &&
+                    Enum.IsDefined(typeof(ClassType), class_type_enum))
                 {
                     break;
                 }
+
                 Console.WriteLine("Invalid class type. Please enter 'Economy', 'Business', or 'FirstClass':");
             }
-
             bookingservice.Book(flight_id, passenger_id, class_type_enum);
         }
-
     }
-
 }
-    
