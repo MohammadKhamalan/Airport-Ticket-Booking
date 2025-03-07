@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Airport_Ticket_Booking.Models;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -10,9 +11,9 @@ namespace Airport_Ticket_Booking
             public int Id { get; set; }
             public int FlightId { get; set; }
             public int PassengerId { get; set; }
-            public string ClassType { get; set; } 
+            public ClassType ClassType { get; set; } 
 
-            public Booking(int id, int flightId, int passengerId, string classType)
+            public Booking(int id, int flightId, int passengerId, ClassType classType)
             {
                 Id = id;
                 FlightId = flightId;

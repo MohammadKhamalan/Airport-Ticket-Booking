@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Airport_Ticket_Booking.Models;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Airport_Ticket_Booking.Services
 {
@@ -11,11 +13,9 @@ namespace Airport_Ticket_Booking.Services
         private List<Booking> Bookings = new List<Booking>();
         FlightService flights = new FlightService();
         string Booking_path = @"C:\Users\ASUS\Desktop\Airport Ticket Booking\Data\Booking.csv";
-        public BookingService()
-        {
-            Load_Bookings();
-           
-        }
+
+
+
         public void Load_Bookings()
         {
             if (File.Exists(Booking_path))
@@ -25,15 +25,25 @@ namespace Airport_Ticket_Booking.Services
                 foreach (var line in lines)
                 {
                     var data = line.Split(',');
-
-                    Bookings.Add(new Booking(int.Parse(data[0]), int.Parse(data[1]), int.Parse(data[2]), data[3]));
-
+                    if (data.Length >= 4 && Enum.TryParse<ClassType>(data[3].Trim(), out var classType))
+                    {
+                        Bookings.Add(new Booking(int.Parse(data[0]), int.Parse(data[1]), int.Parse(data[2]), classType));
+                    }
 
                 }
             }
         }
-        public void Book(int flight_id, int passenger_id, string classType)
+
+          
+      
+        public void Book(int flight_id, int passenger_id, ClassType classType)
         {
+            var existingBooking = Bookings.FirstOrDefault(b => b.FlightId == flight_id && b.PassengerId == passenger_id);
+            if (existingBooking != null)
+            {
+                Console.WriteLine("You have already booked this flight.");
+                return;
+            }
             int NewBookingId = (Bookings.Count > 0) ? Bookings.Max(b => b.Id + 1) : 1;
             Bookings.Add(new Booking(NewBookingId, flight_id, passenger_id, classType));
             using (StreamWriter sw = new StreamWriter(Booking_path, true))
@@ -43,9 +53,9 @@ namespace Airport_Ticket_Booking.Services
             Console.WriteLine($"Booking {NewBookingId} added successfully!");
 
         }
-        public List<Booking> View_Personal_Bookings(int passenger_id)
+        public List<Booking> ViewPersonalBookings(int passenger_id)
         {
-            var personal_bookings = Bookings.Where(booking => booking.PassengerId == passenger_id).ToList(); // Convert to List
+            var personal_bookings = Bookings.Where(booking => booking.PassengerId == passenger_id).ToList();
 
             if (personal_bookings.Count == 0)
             {
@@ -59,10 +69,11 @@ namespace Airport_Ticket_Booking.Services
                 }
             }
 
-            return personal_bookings; 
+            return personal_bookings;
         }
 
-        public void Modify_Book(int bookingId)
+
+        public void ModifyBook(int bookingId)
         {
             var booking = Bookings.Find(booking => booking.Id == bookingId);
 
@@ -84,14 +95,14 @@ namespace Airport_Ticket_Booking.Services
 
                 Console.WriteLine("Enter New Class Type (Press Enter to keep current):");
                 string newClassType = Console.ReadLine();
-                if (!string.IsNullOrWhiteSpace(newClassType))
+                if (!string.IsNullOrWhiteSpace(newClassType) && Enum.TryParse<ClassType>(newClassType, true, out var parsedClassType))
                 {
-                    booking.ClassType = newClassType;
+                    booking.ClassType = parsedClassType;
                 }
 
                 Console.WriteLine($"Booking {booking.Id} modified successfully!");
 
-                Save_Bookings();
+                SaveBookings();
             }
             else
             {
@@ -100,13 +111,13 @@ namespace Airport_Ticket_Booking.Services
         }
 
 
-        public void Cancel_Book(int bookingId)
+        public void CancelBook(int bookingId)
         {
-            var booking = Bookings.Find(booking => booking.Id == bookingId);
+            var booking = Bookings.FirstOrDefault(b => b.Id == bookingId);
             if (booking != null)
             {
                 Bookings.Remove(booking);
-                Save_Bookings();
+                SaveBookings();
                 Console.WriteLine($"Booking {bookingId} has been canceled successfully.");
             }
             else
@@ -115,7 +126,7 @@ namespace Airport_Ticket_Booking.Services
             }
         }
 
-        private void Save_Bookings()
+        private void SaveBookings()
         {
             using (StreamWriter sw = new StreamWriter(Booking_path, false))
             {
@@ -126,24 +137,40 @@ namespace Airport_Ticket_Booking.Services
                 }
             }
         }
-        public List<Booking> filtered_Bookings(int? id, double? max_price, string departure_country, string destination_country, DateTime? departure_date,
-     string departure_airport, string arrival_airport, int? passenger_id, string class_type)
+        public async Task<List<Booking>> FilteredBookingsAsync(int? id, double? max_price, string departure_country, string destination_country, DateTime? departure_date,
+   string departure_airport, string arrival_airport, int? passenger_id, string class_type)
         {
-            flights.ImportFlightsFromCSV(true);
-            var result_booking = Bookings
-                .Where(booking =>
-                    (!id.HasValue || booking.FlightId == id.Value) &&
-                    (!passenger_id.HasValue || booking.PassengerId == passenger_id.Value) &&
-                    (string.IsNullOrEmpty(class_type) || booking.ClassType.Equals(class_type, StringComparison.OrdinalIgnoreCase))
-                ).ToList();
+           
+             await flights.ImportFlightsFromCSVAsync(true);
 
-            if (result_booking.Count == 0)
+            ClassType? classTypeEnum = null;
+            if (!string.IsNullOrEmpty(class_type) && Enum.TryParse<ClassType>(class_type, true, out var parsedClassType))
+            {
+                classTypeEnum = parsedClassType;
+            }
+
+            var filteredBookings = Bookings.ToList();
+            if (id.HasValue)
+            {
+                filteredBookings = filteredBookings.Where(booking => booking.FlightId == id.Value).ToList();
+            }
+
+            if (passenger_id.HasValue)
+            {
+                filteredBookings = filteredBookings.Where(booking => booking.PassengerId == passenger_id.Value).ToList();
+            }
+
+            if (classTypeEnum.HasValue)
+            {
+                filteredBookings = filteredBookings.Where(booking => booking.ClassType == classTypeEnum.Value).ToList();
+            }
+
+            if (filteredBookings.Count == 0)
             {
                 Console.WriteLine("No bookings match your search criteria.");
                 return new List<Booking>();
             }
 
-           
             var filteredFlights = flights.Search_Available_Flights(max_price, departure_country, destination_country, departure_date, departure_airport, arrival_airport, class_type);
 
             if (filteredFlights.Count == 0)
@@ -152,31 +179,28 @@ namespace Airport_Ticket_Booking.Services
                 return new List<Booking>();
             }
 
-            
-            result_booking = result_booking
+            filteredBookings = filteredBookings
                 .Where(booking => filteredFlights.Any(flight => flight.FlightId == booking.FlightId))
                 .ToList();
 
-            if (result_booking.Count == 0)
+            if (filteredBookings.Count == 0)
             {
                 Console.WriteLine("No bookings match the available flights.");
                 return new List<Booking>();
             }
 
-
-
-
             if (max_price.HasValue)
             {
-                DisplayFilteredBookings(result_booking, max_price.Value);
+                DisplayFilteredBookings(filteredBookings, max_price.Value);
             }
             else
             {
-                DisplayFilteredBookings(result_booking, double.MaxValue); 
+                DisplayFilteredBookings(filteredBookings, double.MaxValue);
             }
 
-            return result_booking;
+            return filteredBookings;
         }
+
 
         public void DisplayFilteredBookings(List<Booking> bookings, double maxPrice)
         {
@@ -188,11 +212,14 @@ namespace Airport_Ticket_Booking.Services
 
             var bookingWithPrices = from booking in bookings
                                     join flight in flights.GetFlights() on booking.FlightId equals flight.FlightId
-                                    let price = booking.ClassType.Equals("Economy", StringComparison.OrdinalIgnoreCase) ? flight.EconomyPrice :
-                                                booking.ClassType.Equals("Business", StringComparison.OrdinalIgnoreCase) ? flight.BusinessPrice :
-                                                flight.FirstClassPrice 
+                                    let price = booking.ClassType switch
+                                    {
+                                        ClassType.Economy => flight.EconomyPrice,
+                                        ClassType.Business => flight.BusinessPrice,
+                                        ClassType.FirstClass => flight.FirstClassPrice,
+                                        _ => 0 
+                                    }
                                     where price <= maxPrice
-
                                     select new
                                     {
                                         booking.Id,
@@ -202,7 +229,7 @@ namespace Airport_Ticket_Booking.Services
                                         Price = price
                                     };
 
-            if (!bookingWithPrices.Any()) 
+            if (!bookingWithPrices.Any())
             {
                 Console.WriteLine("No matching bookings found within the price limit.");
                 return;
@@ -220,10 +247,7 @@ namespace Airport_Ticket_Booking.Services
                 Console.WriteLine("-------------------------------------------------------------");
             }
         }
-
-
-
-        public void Display_Bookings()
+        public void DisplayBookings()
         {
             foreach (var booking in Bookings)
             {
