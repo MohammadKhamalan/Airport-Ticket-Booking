@@ -10,3 +10,6 @@ BookingId,FlightId,PassengerId,ClassType
 16,106,4,Business
 17,101,56,Business
 19,104,322,Economy
+20,101,33,Business
+21,111,44,FirstClass
+22,104,23,Economy

@@ -14,7 +14,10 @@ namespace Airport_Ticket_Booking
     
         public static async Task ManagerMenu()
         {
-            bookingservice.Load_Bookings();
+            if (bookingservice.Bookings.Count == 0)  
+            {
+                bookingservice.Load_Bookings();
+            }
             bool backToMain = false;
 
             while (!backToMain)

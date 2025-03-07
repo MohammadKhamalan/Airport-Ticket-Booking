@@ -15,6 +15,7 @@ namespace Airport_Ticket_Booking.Menu
 
      public static async Task PassengerMenu()
         {
+            bookingservice.Load_Bookings();
             await flightService.ImportFlightsFromCSVAsync(false);
             bool backToMain = false;
 

@@ -119,16 +119,10 @@ namespace Airport_Ticket_Booking.Services
                 _ => false
             };
         }
-
-
-
-
         public List<Flight> GetFlights()
         {
             return flights;
         }
-
-
         public void DisplaySearchResults(List<Flight> result)
         {
             if (result.Count == 0)
@@ -150,8 +144,6 @@ namespace Airport_Ticket_Booking.Services
                 Console.WriteLine($"First Class Price: ${flight.FirstClassPrice}");
                 Console.WriteLine("-------------------------------------------------------------");
             }
-
-
         }
         public void DisplayFlights()
         {

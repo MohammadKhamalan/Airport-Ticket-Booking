@@ -10,7 +10,7 @@ namespace Airport_Ticket_Booking.Services
 {
     class BookingService
     {
-        private List<Booking> Bookings = new List<Booking>();
+        public List<Booking> Bookings = new List<Booking>();
         FlightService flights = new FlightService();
         string Booking_path = @"C:\Users\ASUS\Desktop\Airport Ticket Booking\Data\Booking.csv";
 
@@ -18,24 +18,30 @@ namespace Airport_Ticket_Booking.Services
 
         public void Load_Bookings()
         {
+            Bookings.Clear();  
+
             if (File.Exists(Booking_path))
             {
-                var lines = File.ReadAllLines(Booking_path).Skip(1);
+                var lines = File.ReadAllLines(Booking_path).Skip(1); 
 
                 foreach (var line in lines)
                 {
                     var data = line.Split(',');
                     if (data.Length >= 4 && Enum.TryParse<ClassType>(data[3].Trim(), out var classType))
                     {
-                        Bookings.Add(new Booking(int.Parse(data[0]), int.Parse(data[1]), int.Parse(data[2]), classType));
-                    }
+                        int bookingId = int.Parse(data[0]);
+                        int flightId = int.Parse(data[1]);
+                        int passengerId = int.Parse(data[2]);
 
+                        if (!Bookings.Any(b => b.Id == bookingId))
+                        {
+                            Bookings.Add(new Booking(bookingId, flightId, passengerId, classType));
+                        }
+                    }
                 }
             }
         }
 
-          
-      
         public void Book(int flight_id, int passenger_id, ClassType classType)
         {
             var existingBooking = Bookings.FirstOrDefault(b => b.FlightId == flight_id && b.PassengerId == passenger_id);
@@ -44,15 +50,16 @@ namespace Airport_Ticket_Booking.Services
                 Console.WriteLine("You have already booked this flight.");
                 return;
             }
-            int NewBookingId = (Bookings.Count > 0) ? Bookings.Max(b => b.Id + 1) : 1;
-            Bookings.Add(new Booking(NewBookingId, flight_id, passenger_id, classType));
-            using (StreamWriter sw = new StreamWriter(Booking_path, true))
-            {
-                sw.WriteLine($"{NewBookingId},{flight_id},{passenger_id},{classType}");
-            }
-            Console.WriteLine($"Booking {NewBookingId} added successfully!");
 
+            int NewBookingId = (Bookings.Count > 0) ? Bookings.Max(b => b.Id) + 1 : 1;  // Avoiding duplicate IDs
+            var newBooking = new Booking(NewBookingId, flight_id, passenger_id, classType);
+
+            Bookings.Add(newBooking);
+            SaveBookings();
+
+            Console.WriteLine($"Booking {NewBookingId} added successfully!");
         }
+
         public List<Booking> ViewPersonalBookings(int passenger_id)
         {
             var personal_bookings = Bookings.Where(booking => booking.PassengerId == passenger_id).ToList();
@@ -81,26 +88,20 @@ namespace Airport_Ticket_Booking.Services
             {
                 Console.WriteLine("Enter New Flight ID (Press Enter to keep current):");
                 string flightInput = Console.ReadLine();
-                if (int.TryParse(flightInput, out int newFlightId))
-                {
-                    booking.FlightId = newFlightId;
-                }
+                int newFlightId = int.TryParse(flightInput, out int flightId) ? flightId : booking.FlightId;
 
                 Console.WriteLine("Enter New Passenger ID (Press Enter to keep current):");
                 string passengerInput = Console.ReadLine();
-                if (int.TryParse(passengerInput, out int newPassengerId))
-                {
-                    booking.PassengerId = newPassengerId;
-                }
+                int newPassengerId = int.TryParse(passengerInput, out int passengerId) ? passengerId : booking.PassengerId;
 
                 Console.WriteLine("Enter New Class Type (Press Enter to keep current):");
                 string newClassType = Console.ReadLine();
-                if (!string.IsNullOrWhiteSpace(newClassType) && Enum.TryParse<ClassType>(newClassType, true, out var parsedClassType))
-                {
-                    booking.ClassType = parsedClassType;
-                }
+                ClassType newClass = Enum.TryParse(newClassType, true, out ClassType parsedClassType) ? parsedClassType : booking.ClassType;
+                var modifiedBooking = booking with { FlightId = newFlightId, PassengerId = newPassengerId, ClassType = newClass };
+                Bookings.Remove(booking);
+                Bookings.Add(modifiedBooking);
 
-                Console.WriteLine($"Booking {booking.Id} modified successfully!");
+                Console.WriteLine($"Booking {modifiedBooking.Id} modified successfully!");
 
                 SaveBookings();
             }
@@ -128,20 +129,21 @@ namespace Airport_Ticket_Booking.Services
 
         private void SaveBookings()
         {
-            using (StreamWriter sw = new StreamWriter(Booking_path, false))
+            using (StreamWriter sw = new StreamWriter(Booking_path, false)) 
             {
-                sw.WriteLine("BookingId,FlightId,PassengerId,ClassType");
+                sw.WriteLine("BookingId,FlightId,PassengerId,ClassType"); 
                 foreach (var booking in Bookings)
                 {
                     sw.WriteLine($"{booking.Id},{booking.FlightId},{booking.PassengerId},{booking.ClassType}");
                 }
             }
         }
+
         public async Task<List<Booking>> FilteredBookingsAsync(int? id, double? max_price, string departure_country, string destination_country, DateTime? departure_date,
    string departure_airport, string arrival_airport, int? passenger_id, string class_type)
         {
-           
-             await flights.ImportFlightsFromCSVAsync(true);
+
+            await flights.ImportFlightsFromCSVAsync(true);
 
             ClassType? classTypeEnum = null;
             if (!string.IsNullOrEmpty(class_type) && Enum.TryParse<ClassType>(class_type, true, out var parsedClassType))
@@ -217,7 +219,7 @@ namespace Airport_Ticket_Booking.Services
                                         ClassType.Economy => flight.EconomyPrice,
                                         ClassType.Business => flight.BusinessPrice,
                                         ClassType.FirstClass => flight.FirstClassPrice,
-                                        _ => 0 
+                                        _ => 0
                                     }
                                     where price <= maxPrice
                                     select new
