@@ -14,6 +14,6 @@ BookingId,FlightId,PassengerId,ClassType
 21,111,44,FirstClass
 22,104,23,Economy
 23,102,234,Business
-24,105,234,Economy
-25,104,234,Business
 26,101,34,Economy
+24,101,234,Economy
+27,104,43,Economy

@@ -57,7 +57,7 @@ namespace AirportTicketBooking.Services
                 return new List<Booking>();
             }
 
-            var filteredFlights = _passengerService.Search_Available_Flights(max_price, departure_country, destination_country,
+            var filteredFlights = _passengerService.SearchAvailableFlights(max_price, departure_country, destination_country,
                 departure_date, departure_airport, arrival_airport, class_type);
 
             if (filteredFlights.Count == 0)

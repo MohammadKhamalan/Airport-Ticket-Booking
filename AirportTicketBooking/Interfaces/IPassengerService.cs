@@ -10,7 +10,7 @@ namespace AirportTicketBooking.AirportTicketBooking.Interfaces
         List<Booking> ViewPersonalBookings(int passenger_id);
         void ModifyBook(int bookingId);
         void CancelBook(int bookingId);
-        List<Flight> Search_Available_Flights(double? maxprice, string departure_country, string destination_country,
+        List<Flight> SearchAvailableFlights(double? maxprice, string departure_country, string destination_country,
            DateTime? departure_date, string departure_airport, string arrival_airport, string classType);
     }
 }

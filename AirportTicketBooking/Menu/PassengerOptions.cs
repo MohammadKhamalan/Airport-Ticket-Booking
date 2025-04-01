@@ -150,7 +150,7 @@ namespace AirportTicketBooking.Menu
             Console.WriteLine("Enter class type (economy, business, firstclass) (or press Enter to skip):");
             string classTypeInput = Console.ReadLine();
 
-            List<Flight> results = _passengerService.Search_Available_Flights(
+            List<Flight> results = _passengerService.SearchAvailableFlights(
                 maxPrice, departureCountry, destinationCountry,
                 departureDate, departureAirport, arrivalAirport, classTypeInput);
 
