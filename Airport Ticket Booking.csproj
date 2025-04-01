@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
 	  <TargetFramework>net9.0</TargetFramework>
-	  <RootNamespace>Airport_Ticket_Booking</RootNamespace>
+	  <RootNamespace>AirportTicketBooking</RootNamespace>
   </PropertyGroup>
 
 </Project>

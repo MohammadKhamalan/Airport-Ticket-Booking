@@ -1,16 +1,43 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Airport_Ticket_Booking.Menu;
-using Airport_Ticket_Booking.Models;
-using Airport_Ticket_Booking.Services;
-namespace Airport_Ticket_Booking
+using AirportTicketBooking.Menu;
+using AirportTicketBooking.Services;
+
+namespace AirportTicketBooking
 {
     class Program
     {
-     
         static async Task Main(string[] args)
         {
+            
+            var flights = new List<Flight>();
+
+            var bookingsData = new BookingDataService();
+            var flightDataService = new FlightDataService(flights);
+
+            var flightImportService = new FlightImportService(flightDataService);
+            var flightDisplayService = new FlightDisplayService(flightDataService);
+            var passengerService = new PassengerService(bookingsData, flightDataService);
+            var bookingDisplayService = new BookingDisplayService(bookingsData, flightDataService);
+            var bookingManagerService = new BookingManagerService(
+                bookingsData, flightImportService, passengerService);
+
+            bookingsData.Load_Bookings();
+            await flightImportService.ImportFlightsFromCSVAsync(false);
+
+            var managerOptions = new ManagerOptions(
+                bookingManagerService,
+                bookingDisplayService,
+                flightImportService,
+                flightDisplayService);
+
+            var passengerOptions = new PassengerOptions(
+                passengerService,
+                flightDisplayService,
+                bookingsData,
+                flightImportService);
+
             bool exit = false;
 
             while (!exit)
@@ -26,11 +53,10 @@ namespace Airport_Ticket_Booking
                 switch (choice)
                 {
                     case "1":
-                        await PassengerOptions.PassengerMenu();
+                        await passengerOptions.PassengerMenu();
                         break;
                     case "2":
-                        await ManagerOptions.ManagerMenu();
-
+                        await managerOptions.ManagerMenu();
                         break;
                     case "3":
                         exit = true;
@@ -42,6 +68,5 @@ namespace Airport_Ticket_Booking
                 }
             }
         }
-
     }
 }
