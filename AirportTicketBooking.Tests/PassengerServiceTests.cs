@@ -112,21 +112,20 @@ namespace AirportTicketBooking.Tests
             // Arrange
             var existingBookings = new List<Booking>
     {
-        new Booking(1, 1, 1, ClassType.Economy)  
+        new Booking(1, 1, 1, ClassType.Economy)
     };
 
             _mockBookingData.Setup(m => m.Bookings).Returns(existingBookings);
             _mockBookingData.Setup(m => m.SaveBookings()).Verifiable();
 
-            
             var consoleReaderMock = new Mock<IConsoleReader>();
             consoleReaderMock.SetupSequence(m => m.ReadLine())
                 .Returns("2")  
                 .Returns("2")  
-                .Returns("Business");  
+                .Returns("Business"); 
 
             // Act
-            _passengerService.ModifyBook(1, consoleReaderMock.Object);  
+            _passengerService.ModifyBook(1, consoleReaderMock.Object);
 
             // Assert
             var modifiedBooking = existingBookings.FirstOrDefault(b => b.Id == 1);
@@ -137,6 +136,7 @@ namespace AirportTicketBooking.Tests
 
             _mockBookingData.Verify(m => m.SaveBookings(), Times.Once, "because SaveBookings should be called after modifying the booking");
         }
+
         [Fact]
         public void SearchAvailableFlights_ShouldReturnFlights_WhenSearchingByDepartureCountry()
         {
