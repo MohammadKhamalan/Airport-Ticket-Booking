@@ -9,7 +9,7 @@ on:
       - '**.csproj'
 
 env:
-  DOTNET_VERSION: '9.0.100-preview.3' 
+  DOTNET_VERSION: '6.0.401' 
 jobs:
   build-and-test:
     name: build-and-test-${{matrix.os}}
