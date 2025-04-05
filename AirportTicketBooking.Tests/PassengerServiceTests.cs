@@ -21,6 +21,7 @@ namespace AirportTicketBooking.Tests
             _mockFlightData = new Mock<IFlightsData>();
             _passengerService = new PassengerService(_mockBookingData.Object, _mockFlightData.Object);
         }
+        
         [Fact]
         public void Book_ShouldAddBooking_WhenBookingDoesNotExist()
         {
@@ -44,15 +45,15 @@ namespace AirportTicketBooking.Tests
             _mockBookingData.Verify(m => m.SaveBookings(), Times.Once, "because SaveBookings should be called once");
         }
 
+
         [Fact]
         public void CancelBook_ShouldRemoveBooking_WhenBookingExists()
         {
             // Arrange
             var existingBookings = new List<Booking>
-        {
-            new Booking(1, 1, 1, ClassType.Economy)
-        };
-
+    {
+        new Booking(1, 1, 1, ClassType.Economy)
+    };
             _mockBookingData.Setup(m => m.Bookings).Returns(existingBookings);
             _mockBookingData.Setup(m => m.SaveBookings()).Verifiable();
 
@@ -65,15 +66,16 @@ namespace AirportTicketBooking.Tests
             existingBookings.Should().BeEmpty("because the booking with the specified ID should be removed");
             _mockBookingData.Verify(m => m.SaveBookings(), Times.Once, "because SaveBookings should be called once after cancellation");
         }
+
+     
         [Fact]
         public void CancelBook_ShouldNotRemoveBooking_WhenBookingDoesNotExist()
         {
             // Arrange
             var existingBookings = new List<Booking>
-        {
-            new Booking(1, 1, 1, ClassType.Economy)
-        };
-
+    {
+        new Booking(1, 1, 1, ClassType.Economy)
+    };
             _mockBookingData.Setup(m => m.Bookings).Returns(existingBookings);
             _mockBookingData.Setup(m => m.SaveBookings()).Verifiable();
 
@@ -86,15 +88,17 @@ namespace AirportTicketBooking.Tests
             existingBookings.Should().HaveCount(1, "because the booking list should remain unchanged when the booking does not exist");
             _mockBookingData.Verify(m => m.SaveBookings(), Times.Never, "because SaveBookings should not be called if the booking does not exist");
         }
+
+ 
         [Fact]
         public void ViewPersonalBookings_ShouldReturnBookings_WhenBookingsExist()
         {
             // Arrange
             var existingBookings = new List<Booking>
-            {
-                new Booking(1, 1, 1, ClassType.Economy),
-                new Booking(2, 1, 2, ClassType.Business)
-            };
+    {
+        new Booking(1, 1, 1, ClassType.Economy),
+        new Booking(2, 1, 2, ClassType.Business)
+    };
             _mockBookingData.Setup(m => m.Bookings).Returns(existingBookings);
 
             int passengerId = 1;
@@ -104,29 +108,29 @@ namespace AirportTicketBooking.Tests
 
             // Assert
             personalBookings.Should().HaveCount(1, "because there are one booking for this passenger");
-           
+            personalBookings.All(b => b.PassengerId == passengerId).Should().BeTrue("because all bookings should belong to the specified passenger");
         }
+
         [Fact]
         public void ModifyBook_ShouldModifyBooking_WhenBookingExists()
         {
             // Arrange
             var existingBookings = new List<Booking>
     {
-        new Booking(1, 1, 1, ClassType.Economy)  
+        new Booking(1, 1, 1, ClassType.Economy)
     };
 
             _mockBookingData.Setup(m => m.Bookings).Returns(existingBookings);
             _mockBookingData.Setup(m => m.SaveBookings()).Verifiable();
 
-            
             var consoleReaderMock = new Mock<IConsoleReader>();
             consoleReaderMock.SetupSequence(m => m.ReadLine())
                 .Returns("2")  
                 .Returns("2")  
-                .Returns("Business");  
+                .Returns("Business"); 
 
             // Act
-            _passengerService.ModifyBook(1, consoleReaderMock.Object);  
+            _passengerService.ModifyBook(1, consoleReaderMock.Object);
 
             // Assert
             var modifiedBooking = existingBookings.FirstOrDefault(b => b.Id == 1);
@@ -137,6 +141,7 @@ namespace AirportTicketBooking.Tests
 
             _mockBookingData.Verify(m => m.SaveBookings(), Times.Once, "because SaveBookings should be called after modifying the booking");
         }
+
         [Fact]
         public void SearchAvailableFlights_ShouldReturnFlights_WhenSearchingByDepartureCountry()
         {
