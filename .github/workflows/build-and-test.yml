@@ -1,35 +1,33 @@
-name: build and test
+name: Build and Test
 
 on:
   push:
   pull_request:
     branches: [ main ]
     paths:
-      - '**.cs'
-      - '**.csproj'
+      - '**/*.cs'
+      - '**/*.csproj'
 
 env:
-  DOTNET_VERSION: '6.0.401' 
+  DOTNET_VERSION: '9.0.x' 
 jobs:
   build-and-test:
-    name: build-and-test-${{matrix.os}}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest] # Temporarily test only on Ubuntu
+    runs-on: windows-latest  # Windows is required for WinForms apps
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Install dependencies
-      run: dotnet restore
-      
-    - name: Build
-      run: dotnet build --configuration Release --no-restore
-    
-    - name: Test
-      run: dotnet test --no-restore --verbosity normal
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build solution
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Run tests
+        run: dotnet test --configuration Release --no-restore --verbosity normal
