@@ -1,6 +1,7 @@
 ﻿using AirportTicketBooking.AirportTicketBooking.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AirportTicketBooking.Services
 {
@@ -13,13 +14,15 @@ namespace AirportTicketBooking.Services
             _flightsData = flightsData;
         }
 
+
         public void DisplaySearchResults(List<Flight> result)
         {
-            if (result.Count == 0)
+            if (result == null || !result.Any())
             {
                 Console.WriteLine("No flights match your search criteria.");
                 return;
             }
+
 
             Console.WriteLine("Available Flights:");
             Console.WriteLine("-------------------------------------------------------------");

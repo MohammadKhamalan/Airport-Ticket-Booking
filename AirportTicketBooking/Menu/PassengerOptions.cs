@@ -1,5 +1,6 @@
 ﻿using AirportTicketBooking.AirportTicketBooking.Interfaces;
 using AirportTicketBooking.AirportTicketBooking.Models.Enums;
+using AirportTicketBooking.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ namespace AirportTicketBooking.Menu
         private readonly IFlightService _flightService;
         private readonly IBookingsData _bookingsData;
         private readonly IFlightImportService _flightImportService;
+        IConsoleReader consoleReader = new ConsoleReader();
 
         public PassengerOptions(
             IPassengerService passengerService,
@@ -101,8 +103,9 @@ namespace AirportTicketBooking.Menu
                         {
                             Console.WriteLine("Invalid input. Please enter a valid ID:");
                         }
+                        _passengerService.ModifyBook(bookId, consoleReader);
 
-                        _passengerService.ModifyBook(bookId);
+                        //_passengerService.ModifyBook(bookId);
                         break;
                     case "3":
                         Console.WriteLine("Enter The Booking ID You Want To Cancel:");
