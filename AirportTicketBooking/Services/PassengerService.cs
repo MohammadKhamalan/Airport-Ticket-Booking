@@ -101,49 +101,6 @@ namespace AirportTicketBooking.Services
         }
 
 
-        //public void ModifyBook(int bookingId)
-        //{
-        //    var booking = _bookingsData.Bookings.FirstOrDefault(b => b.Id == bookingId);
-        //    if (booking == null)
-        //    {
-        //        Console.WriteLine($"Booking with ID {bookingId} not found.");
-        //        return;
-        //    }
-
-        //    Console.WriteLine("Current booking details:");
-        //    Console.WriteLine($"- Flight ID: {booking.FlightId}");
-        //    Console.WriteLine($"- Passenger ID: {booking.PassengerId}");
-        //    Console.WriteLine($"- Class: {booking.ClassType}");
-
-        //    Console.WriteLine("Enter new Flight ID (press Enter to keep current):");
-        //    string flightInput = Console.ReadLine();
-        //    int newFlightId = string.IsNullOrEmpty(flightInput) ?
-        //        booking.FlightId : int.Parse(flightInput);
-
-        //    Console.WriteLine("Enter new Passenger ID (press Enter to keep current):");
-        //    string passengerInput = Console.ReadLine();
-        //    int newPassengerId = string.IsNullOrEmpty(passengerInput) ?
-        //        booking.PassengerId : int.Parse(passengerInput);
-
-        //    Console.WriteLine("Enter new Class Type (Economy/Business/FirstClass, press Enter to keep current):");
-        //    string classInput = Console.ReadLine();
-        //    ClassType newClass = string.IsNullOrEmpty(classInput) ?
-        //        booking.ClassType : Enum.Parse<ClassType>(classInput, true);
-
-        //    var modifiedBooking = booking with
-        //    {
-        //        FlightId = newFlightId,
-        //        PassengerId = newPassengerId,
-        //        ClassType = newClass
-        //    };
-
-        //    _bookingsData.Bookings.Remove(booking);
-        //    _bookingsData.Bookings.Add(modifiedBooking);
-        //    _bookingsData.SaveBookings();
-
-        //    Console.WriteLine($"Booking {bookingId} modified successfully!");
-        //}
-
         public void CancelBook(int bookingId)
         {
             var booking = _bookingsData.Bookings.FirstOrDefault(b => b.Id == bookingId);
